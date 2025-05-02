@@ -6,7 +6,7 @@
 /*   By: dnahon <dnahon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:15:04 by dnahon            #+#    #+#             */
-/*   Updated: 2025/05/02 16:37:22 by dnahon           ###   ########.fr       */
+/*   Updated: 2025/05/02 19:00:10 by dnahon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,3 +64,22 @@ int	main(int argc, char **argv)
 	close(fd);
 	return (0);
 }
+
+
+/*
+Variables gnl :
+buff
+static tmp
+keep tmp
+line
+
+fonctions :
+
+memcpy
+strchr
+strjoin
+
+read buff > memcpy buff to static tmp > free buff > strchr '\n' >read buff > memcpy static tmp to keep_tmp > free static tmp > strjoin(static tmp, keep_tmp)
+free buff and keep_tmp > strchr '\n'
+if \n > copier dans keep_tmp ce qu'il y a apres \n > memcpy ce qu'il y a avant \n dans line > free static tmp > memcpy keep_tmp to static tmp > return line + '\0'
+*/
