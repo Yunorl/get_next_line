@@ -5,81 +5,80 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dnahon <dnahon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/30 13:15:04 by dnahon            #+#    #+#             */
-/*   Updated: 2025/05/02 19:00:10 by dnahon           ###   ########.fr       */
+/*   Created: 2025/05/05 20:26:53 by dnahon            #+#    #+#             */
+/*   Updated: 2025/05/05 20:26:53 by dnahon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*get_lines(int fd, char *stash)
+char	*update_stash(char *stash)
 {
-	int		bytes_read;
-	char	*buffer;
+	char	*new_stash;
+	size_t	i;
+	size_t	j;
 
-	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buffer)
+	if (!stash)
 		return (NULL);
+	i = 0;
+	while (stash[i] && stash[i] != '\n')
+		i++;
+	if (!stash[i])
+		return (free(stash), NULL);
+	new_stash = malloc(ft_strlen(stash) - i);
+	if (!new_stash)
+		return (free(stash), NULL);
+	i++;
+	j = 0;
+	while (stash[i])
+		new_stash[j++] = stash[i++];
+	new_stash[j] = '\0';
+	free(stash);
+	return (new_stash);
+}
+
+char	*read_to_stash(int fd, char *stash)
+{
+	char	*buffer;
+	ssize_t	bytes_read;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (free(stash), NULL);
 	bytes_read = 1;
-	while (bytes_read != 0 && !ft_strchr(stash, '\n'))
+	while (!ft_strchr(stash, '\n') && bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
-		{
-			free(buffer);
-			return (NULL);
-		}
+			return (free(buffer), free(stash), NULL);
 		buffer[bytes_read] = '\0';
 		stash = ft_strjoin(stash, buffer);
+		if (!stash)
+			return (free(buffer), NULL);
 	}
 	free(buffer);
+	if (bytes_read == 0 && (!stash || !*stash))
+		return (free(stash), NULL);
 	return (stash);
 }
 
 char	*get_next_line(int fd)
 {
+	static char	*stash;
+	char		*line;
+
+	stash = read_to_stash(fd, stash);
+	if (!stash)
+		return (NULL);
+	line = extract_line(stash);
+	if (!line)
+	{
+		free(stash);
+		stash = NULL;
+		return (NULL);
+	}
+	stash = update_stash(stash);
+	return (line);
 }
-
-int	main(int argc, char **argv)
-{
-	int		fd;
-	char	*line;
-
-	if (argc != 2)
-	{
-		ft_putstr_fd("Usage: ./get_next_line <file>\n", 2);
-		return (1);
-	}
-	fd = open(argv[1], O_RDONLY);
-	if (fd == -1)
-	{
-		perror("Error opening file");
-		return (1);
-	}
-	while ((line = get_next_line(fd)))
-	{
-		ft_putstr_fd(line, 1);
-		free(line);
-	}
-	close(fd);
-	return (0);
-}
-
-
-/*
-Variables gnl :
-buff
-static tmp
-keep tmp
-line
-
-fonctions :
-
-memcpy
-strchr
-strjoin
-
-read buff > memcpy buff to static tmp > free buff > strchr '\n' >read buff > memcpy static tmp to keep_tmp > free static tmp > strjoin(static tmp, keep_tmp)
-free buff and keep_tmp > strchr '\n'
-if \n > copier dans keep_tmp ce qu'il y a apres \n > memcpy ce qu'il y a avant \n dans line > free static tmp > memcpy keep_tmp to static tmp > return line + '\0'
-*/

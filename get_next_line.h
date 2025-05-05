@@ -6,7 +6,7 @@
 /*   By: dnahon <dnahon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 13:18:09 by dnahon            #+#    #+#             */
-/*   Updated: 2025/05/02 15:08:16 by dnahon           ###   ########.fr       */
+/*   Updated: 2025/05/05 17:15:03 by dnahon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 500
+#  define BUFFER_SIZE 42
 # endif
 
 # include <fcntl.h>
@@ -27,9 +27,13 @@
 # include <strings.h>
 # include <unistd.h>
 
-void	ft_putstr_fd(char *str, int fd);
-int		ft_strlen(const char *str);
-char	*ft_strjoin(char const *s1, char const *s2);
-char	*ft_strchr(const char *str, int c);
+char	*get_next_line(int fd);
+size_t	ft_strlen(const char *s);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *s1);
+char	*ft_strjoin(char *s1, char *s2);
+char	*extract_line(char *stash);
+char	*update_stash(char *stash);
+char	*read_to_stash(int fd, char *stash);
 
 #endif
